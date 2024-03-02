@@ -2,10 +2,11 @@ import React from "react";
 import { Item } from "../App";
 
 type TodoStateProps = {
-  todoList:Item;
+  todoList:Item[];
+  getProcessState: (id:Number) => void
 }
 
-const TodoState = ({ todoList}:TodoStateProps) => {
+const TodoState = ({ todoList,getProcessState}:TodoStateProps) => {
   return (
     <div className="w-[300px] h-[350px] border border-black m-10">
       <div className="p-1">
@@ -18,7 +19,7 @@ const TodoState = ({ todoList}:TodoStateProps) => {
         return (
           <div key={i} className="h-10 flex justify-between text-center border border-black p-2 text-base font-bold m-1">
             <h3>{singleObj.todo}</h3>
-            <p className="border border-black">+</p>
+            <button onClick={() => getProcessState(singleObj.id) } className="border border-black">+</button>
           </div>
         );
       })}

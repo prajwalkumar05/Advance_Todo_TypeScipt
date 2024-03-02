@@ -3,7 +3,7 @@ import CurrentTime from "./CurrentTime";
 import { Item } from "../App";
 
 type MyComponentProps = {
-  getTodo: Item;
+  getTodo: (Item:Object) => void;
 };
 
 const AddTodoList = ({ getTodo }: MyComponentProps) => {
@@ -12,7 +12,7 @@ const AddTodoList = ({ getTodo }: MyComponentProps) => {
 
   const handleSubmit = () => {
     const newTodo: Item = {
-      id: Math.floor(Math.random() * 1000), // Generate a random id
+      id: Math.floor(Math.random() * 10000), // Generate a random id
       todo: todoText,
       date: new Date(), // Set the current date
     };
