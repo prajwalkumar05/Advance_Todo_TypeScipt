@@ -1,7 +1,8 @@
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import AddTodoList from "./components/AddTodoList";
 import TodoState from "./components/TodoState";
 import ProcessState from "./components/ProcessState";
+import CompleteState from "./components/CompleteState";
 
 export type Item = {
   id: number;
@@ -14,48 +15,55 @@ function App() {
   const [processList, setProcessList] = useState<Item[]>([]);
   const [complete, setComplete] = useState<Item[]>([]);
 
-  console.log(complete);
+  console.log(todoList);
 
-  const getTodo = (todo: Item) => {
-    setTodoList((todos) => {
-      return [...todos, { ...todo }];
-    });
-  };
+  const getTodo = useCallback((todo: Item) => {
+    setTodoList((todos) => [...todos, { ...todo }]);
+  }, []);
 
-  const getProcessState = (id:Number) => {
-    console.log(id);
+  const getTodoList = useCallback((id: number) => {
+    const todoToAdd = processList.find((todo) => todo.id === id);
+    if (todoToAdd) {
+      setTodoList((todos) => [...todos, todoToAdd]);
+      setProcessList((processList) => processList.filter((todo) => todo.id !== id));
+    }
+  }, [processList]);
 
-    const filterForTodolist = todoList.filter((todo) => todo.id !== id);
+  const getProcessState = useCallback((id: number) => {
+    const todoToAdd = todoList.find((todo) => todo.id === id);
+    if (todoToAdd) {
+      setTodoList((todos) => todos.filter((todo) => todo.id !== id));
+      setProcessList((processList) => [...processList, todoToAdd]);
+    }
+  }, [todoList]);
 
-    //update todolist
-    setTodoList([...filterForTodolist]);
+  const completeState = useCallback((id: number) => {
+    const todoToAdd = processList.find((todo) => todo.id === id);
+    if (todoToAdd) {
+      setProcessList((processList) => processList.filter((todo) => todo.id !== id));
+      setComplete((complete) => [...complete, todoToAdd]);
+    }
+  }, [processList]);
 
-    const filterForProcessList = todoList.filter((todo) => todo.id === id);
-    setProcessList((todos) => {
-      return [...todos, ...filterForProcessList];
-    });
-    // setProcessList(filterForProcessList)
-    // setTodos(todos.filter(todo => todo.id !== id));
-  };
-
-
-  const completeState = (id:Number) => {
-    console.log(id);
-
-    const filterForCompleteList = processList.filter((todo) => todo.id === id);
-
-    setComplete((todos) => {
-      return [...todos, ...filterForCompleteList];
-    });
-  };
-  console.log(complete);
+  const getBackToProcess = useCallback((id: number) => {
+    const todoToAdd = complete.find((todo) => todo.id === id);
+    if (todoToAdd) {
+      setComplete((complete) => complete.filter((todo) => todo.id !== id));
+      setProcessList((processList) => [...processList, todoToAdd]);
+    }
+  }, [complete]);
 
   return (
     <div className="w-full">
       <AddTodoList getTodo={getTodo} />
       <div className="flex justify-center">
         <TodoState todoList={todoList} getProcessState={getProcessState} />
-        <ProcessState todoList={processList} completeState={completeState} />
+        <ProcessState
+          todoList={processList}
+          getTodoList={getTodoList}
+          completeState={completeState}
+        />
+        <CompleteState todoList={complete} getBackToProcess={getBackToProcess} />
       </div>
     </div>
   );
